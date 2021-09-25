@@ -45,7 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+CommandLineInterfaceControllerHandle_t hCLI;
+ApplicationHandler_t hApplication;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,12 +89,15 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
-  ApplicationHandler_t Application;
+  /* USER CODE BEGIN 2 */  
+  CommandLineInterfaceController_Init(&hCLI);
+  ApplicationManager_Init(&hApplication);
 
+  CommandLineInterfaceController_WriteMessage(&hCLI, "COMMAND LINE INTERFACE\r");
 
+  HAL_UART_Receive_IT(&huart2, (uint8_t*) &hCLI.pCLI_Buffer[hCLI.CLI_BufferHead], 1u);
 
-  ApplicationManager_StateMachine(&Application);
+  ApplicationManager_StateMachine(&hApplication);
   /* USER CODE END 2 */
 
   /* Infinite loop */

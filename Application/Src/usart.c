@@ -21,7 +21,8 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-
+extern CommandLineInterfaceControllerHandle_t hCLI;
+extern ApplicationHandler_t hApplication;
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart2;
@@ -105,7 +106,48 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 } 
 
 /* USER CODE BEGIN 1 */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	// Check if buffer is not full, if yes generate error message
+	if(hCLI.CLI_BufferHead != hCLI.CLI_BufferSize)
+	{
+		// Echo functionality
+		HAL_UART_Transmit(huart, (uint8_t*) &hCLI.pCLI_Buffer[hCLI.CLI_BufferHead], 1u, 100u);
+
+		// Check if enter button has been pushed
+		if(hCLI.pCLI_Buffer[hCLI.CLI_BufferHead] == '\r')
+		{
+			hApplication.ApplicationState = APP_STATE_GOT_COMMAND;
+			hApplication.MessageLength = hCLI.CLI_BufferHead;
+
+			// Reset command line interface controller buffer head
+			hCLI.CLI_BufferHead = 0u;
+		}
+		// Check if backspace button has been pushed
+		else if(hCLI.pCLI_Buffer[hCLI.CLI_BufferHead] == 127u)
+		{
+			if(hCLI.CLI_BufferHead > 0u)
+			{
+				hCLI.CLI_BufferHead--;
+			}
+		}
+		else
+		{
+			hCLI.CLI_BufferHead++;
+		}
+	}
+	else
+	{
+		CommandLineInterfaceController_WriteMessage(&hCLI, "\rERROR : command is too long !\r");
+
+		hCLI.CLI_BufferHead = 0u;
+	}
+
+	// Reenable UART receive interrupt
+	HAL_UART_Receive_IT(huart, (uint8_t*) &hCLI.pCLI_Buffer[hCLI.CLI_BufferHead], 1u);
+}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -27,7 +27,8 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "ApplicationManager.h"
+#include "CommandLineInterfaceController.h"
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart2;

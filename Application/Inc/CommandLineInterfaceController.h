@@ -7,23 +7,23 @@
 
 #include "stm32f4xx_hal.h"
 
+// General purpose macro definitions
+#define COMMAND_LINE_INTERFACE_CONTROLLER_CMD_COUNT			3u
+#define COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH	250u
 
+// Command ID macro definitions
 #define COMMAND_LINE_INTERFACE_CONTROLLER_CMD_HELP			0u
 #define COMMAND_LINE_INTERFACE_CONTROLLER_CMD_CONNECT		1u
 #define COMMAND_LINE_INTERFACE_CONTROLLER_CMD_DISCONNECT	2u
 #define COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MESSAGE		3u
 
 
-// Struct to improve !!!
+// Command line interface controller handle structure definition
 typedef struct
 {
-	char *pCLI_TX_Buffer;
-	char *pCLI_RX_Buffer;
-	uint16_t CLI_TX_BufferSize;
-	uint16_t CLI_RX_BufferSize;
-	uint8_t CLI_TX_BufferHead;
-	uint8_t CLI_RX_BufferHead;
-	uint8_t State;
+	char *pCLI_Buffer;
+	uint16_t CLI_BufferSize;
+	uint8_t CLI_BufferHead;
 } CommandLineInterfaceControllerHandle_t;
 
 
