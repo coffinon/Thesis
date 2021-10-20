@@ -119,6 +119,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		// Check if enter button has been pushed
 		if(hCLI.pCLI_Buffer[hCLI.CLI_BufferHead] == '\r')
 		{
+			// Send /n
+			char letter = '\n';
+			HAL_UART_Transmit(huart, (uint8_t*) &letter, 1u, 100u);
+
 			hApplication.ApplicationState = APP_STATE_GOT_COMMAND;
 			hApplication.MessageLength = hCLI.CLI_BufferHead;
 
@@ -140,7 +144,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 	else
 	{
-		CommandLineInterfaceController_WriteMessage(&hCLI, "\rERROR : command is too long !\r");
+		CommandLineInterfaceController_WriteMessage(&hCLI, "\rERROR : command is too long !\r\n");
 
 		hCLI.CLI_BufferHead = 0u;
 	}

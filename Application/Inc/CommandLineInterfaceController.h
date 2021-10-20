@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "stm32f4xx_hal.h"
+#include "MY_NRF24.h"
 
 // General purpose macro definitions
 #define COMMAND_LINE_INTERFACE_CONTROLLER_CMD_COUNT			3u
@@ -26,6 +27,7 @@ typedef struct
 	uint8_t CLI_BufferHead;
 } CommandLineInterfaceControllerHandle_t;
 
+void CommandLineInterfaceController_ClearBuffer(CommandLineInterfaceControllerHandle_t *CLI);
 
 void CommandLineInterfaceController_Init(CommandLineInterfaceControllerHandle_t *CLI);
 

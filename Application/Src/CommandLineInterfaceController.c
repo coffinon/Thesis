@@ -2,13 +2,21 @@
 
 extern UART_HandleTypeDef huart2;
 
+extern uint8_t myTxBuffer[100u];
+
 char CommandLineInterfaceController_Buffer[COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH];
 
 static void CommandLineInterfaceController_Controller_Static_HelpHandler(CommandLineInterfaceControllerHandle_t *CLI);
 static void CommandLineInterfaceController_Controller_Static_ConnectHandler(CommandLineInterfaceControllerHandle_t *CLI);
 static void CommandLineInterfaceController_Controller_Static_DisconnectHandler(CommandLineInterfaceControllerHandle_t *CLI);
-static void CommandLineInterfaceController_Controller_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI);
+static void CommandLineInterfaceController_Controller_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI, char *msg, uint8_t length);
 
+void CommandLineInterfaceController_ClearBuffer(CommandLineInterfaceControllerHandle_t *CLI)
+{
+	memset(CLI->pCLI_Buffer, '\0', CLI->CLI_BufferSize);
+
+	CLI->CLI_BufferHead = 0u;
+}
 
 void CommandLineInterfaceController_Init(CommandLineInterfaceControllerHandle_t *CLI)
 {
@@ -31,11 +39,14 @@ void CommandLineInterfaceController_WriteMessage(CommandLineInterfaceControllerH
 	}
 	else
 	{
-		Size = sprintf(CLI->pCLI_Buffer, "ERROR : Message is too long !\r");
+		Size = sprintf(CLI->pCLI_Buffer, "ERROR : Message is too long !\r\n");
 	}
 
     // Send the message
 	HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+
+	// Clear the buffer
+	CommandLineInterfaceController_ClearBuffer(CLI);
 }
 
 
@@ -80,30 +91,60 @@ void CommandLineInterfaceController_GetCommand(CommandLineInterfaceControllerHan
 			CommandLineInterfaceController_Controller_Static_DisconnectHandler(CLI);
 			break;
 		default :
-			CommandLineInterfaceController_Controller_Static_MessageHandler(CLI);
+			CommandLineInterfaceController_Controller_Static_MessageHandler(CLI, msg, length);
 	}
 }
 
 
 static void CommandLineInterfaceController_Controller_Static_HelpHandler(CommandLineInterfaceControllerHandle_t *CLI)
 {
-	CommandLineInterfaceController_WriteMessage(CLI, ">> connect - show list of available connections\r");
-	CommandLineInterfaceController_WriteMessage(CLI, ">> disconnect - disconnect from all connections\r");
+	CommandLineInterfaceController_WriteMessage(CLI, ">> connect - show list of available connections\r\n");
+	CommandLineInterfaceController_WriteMessage(CLI, ">> disconnect - disconnect from all connections\r\n");
 }
 
 static void CommandLineInterfaceController_Controller_Static_ConnectHandler(CommandLineInterfaceControllerHandle_t *CLI)
 {
-	CommandLineInterfaceController_WriteMessage(CLI, "List of available connections : \r");
+	CommandLineInterfaceController_WriteMessage(CLI, "List of available connections : \r\n");
 	// TODO - connections list
 }
 
 static void CommandLineInterfaceController_Controller_Static_DisconnectHandler(CommandLineInterfaceControllerHandle_t *CLI)
 {
 	// TODO - disconnect part of the code
-	CommandLineInterfaceController_WriteMessage(CLI, "Disconnected from all connections\r");
+	CommandLineInterfaceController_WriteMessage(CLI, "Disconnected from all connections\r\n");
 }
 
-static void CommandLineInterfaceController_Controller_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI)
+static void CommandLineInterfaceController_Controller_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI, char *msg, uint8_t length)
 {
 	// TODO - pack the message and send
+	uint8_t status;
+	uint16_t Size;
+
+
+	msg[length++ + 1u] = '\n';
+	msg[length++ + 1u] = '\0';
+
+	if(length <= 32u)
+	{
+		status = NRF24_write(msg, 32u);
+
+		if(status & _BV(BIT_TX_DS))
+		{
+			Size = sprintf(CLI->pCLI_Buffer, "Transmitted Successfully\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+		}
+		else if(status & _BV(BIT_MAX_RT))
+		{
+			Size = sprintf(CLI->pCLI_Buffer, "Max retransmission level reached\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+		}
+		else
+		{
+			Size = sprintf(CLI->pCLI_Buffer, "Error\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+		}
+	}
+	CommandLineInterfaceController_ClearBuffer(CLI);
+
+	NRF24_startListening();;
 }

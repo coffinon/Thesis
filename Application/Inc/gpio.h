@@ -28,11 +28,11 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "MY_NRF24.h"
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
-
+extern UART_HandleTypeDef huart2;
 /* USER CODE END Private defines */
 
 void MX_GPIO_Init(void);

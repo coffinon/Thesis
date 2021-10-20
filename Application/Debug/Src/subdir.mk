@@ -7,8 +7,10 @@
 C_SRCS += \
 ../Src/ApplicationManager.c \
 ../Src/CommandLineInterfaceController.c \
+../Src/MY_NRF24.c \
 ../Src/gpio.c \
 ../Src/main.c \
+../Src/spi.c \
 ../Src/stm32f4xx_hal_msp.c \
 ../Src/stm32f4xx_it.c \
 ../Src/syscalls.c \
@@ -19,8 +21,10 @@ C_SRCS += \
 OBJS += \
 ./Src/ApplicationManager.o \
 ./Src/CommandLineInterfaceController.o \
+./Src/MY_NRF24.o \
 ./Src/gpio.o \
 ./Src/main.o \
+./Src/spi.o \
 ./Src/stm32f4xx_hal_msp.o \
 ./Src/stm32f4xx_it.o \
 ./Src/syscalls.o \
@@ -31,8 +35,10 @@ OBJS += \
 C_DEPS += \
 ./Src/ApplicationManager.d \
 ./Src/CommandLineInterfaceController.d \
+./Src/MY_NRF24.d \
 ./Src/gpio.d \
 ./Src/main.d \
+./Src/spi.d \
 ./Src/stm32f4xx_hal_msp.d \
 ./Src/stm32f4xx_it.d \
 ./Src/syscalls.d \

@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "spi.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -47,6 +48,9 @@
 /* USER CODE BEGIN PV */
 CommandLineInterfaceControllerHandle_t hCLI;
 ApplicationHandler_t hApplication;
+
+uint8_t myRxData[100u];
+uint8_t myTxData[100u];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,13 +93,16 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */  
+  MX_SPI2_Init();
+  /* USER CODE BEGIN 2 */
   CommandLineInterfaceController_Init(&hCLI);
   ApplicationManager_Init(&hApplication);
+  NRF24_begin(NRF24_CE_GPIO_Port, NRF24_CSN_Pin, NRF24_CE_Pin, hspi2);
 
-  CommandLineInterfaceController_WriteMessage(&hCLI, "COMMAND LINE INTERFACE\r");
+  CommandLineInterfaceController_WriteMessage(&hCLI, "COMMAND LINE INTERFACE\r\n");
 
   HAL_UART_Receive_IT(&huart2, (uint8_t*) &hCLI.pCLI_Buffer[hCLI.CLI_BufferHead], 1u);
+  NRF24_startListening();
 
   ApplicationManager_StateMachine(&hApplication);
   /* USER CODE END 2 */
