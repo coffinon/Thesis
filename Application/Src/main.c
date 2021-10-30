@@ -96,6 +96,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI2_Init();
   MX_TIM6_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   CommandLineInterfaceController_Init(&hCLI);
   ApplicationManager_Init(&hApplication);
@@ -105,6 +106,7 @@ int main(void)
 
   HAL_UART_Receive_IT(&huart2, (uint8_t*) &hCLI.pCLI_Buffer[hCLI.CLI_BufferHead], 1u);
   HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start_IT(&htim7);
   NRF24_startListening();
 
   ApplicationManager_StateMachine(&hApplication);

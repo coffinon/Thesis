@@ -15,8 +15,10 @@ static void CommandLineInterfaceController_Controller_Static_MessageHandler(Comm
 void CommandLineInterfaceController_ClearBuffer(CommandLineInterfaceControllerHandle_t *CLI)
 {
 	memset(CLI->pCLI_Buffer, '\0', CLI->CLI_BufferSize);
+	memset(CLI->pCLI_MsgBuffer, '\0', CLI->CLI_MsgBufferSize);
 
 	CLI->CLI_BufferHead = 0u;
+	CLI->CLI_MsgBufferHead = 0u;
 }
 
 void CommandLineInterfaceController_Init(CommandLineInterfaceControllerHandle_t *CLI)
@@ -153,7 +155,7 @@ static void CommandLineInterfaceController_Controller_Static_MessageHandler(Comm
 				Size = sprintf(CLI->pCLI_MsgBuffer, "Message not sent - trying to retransmit\r\n");
 				HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_MsgBuffer, Size, 100u);
 
-				HAL_Delay(1000u);
+				HAL_Delay(500u);
 			}
 			while(!(status & _BV(BIT_TX_DS)));
 
