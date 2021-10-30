@@ -2,9 +2,10 @@
 
 extern UART_HandleTypeDef huart2;
 
-extern uint8_t myTxBuffer[100u];
+extern uint8_t myTxBuffer[1000u];
 
 char CommandLineInterfaceController_Buffer[COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH];
+char CommandLineInterfaceController_MsgBuffer[COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH];
 
 static void CommandLineInterfaceController_Controller_Static_HelpHandler(CommandLineInterfaceControllerHandle_t *CLI);
 static void CommandLineInterfaceController_Controller_Static_ConnectHandler(CommandLineInterfaceControllerHandle_t *CLI);
@@ -21,10 +22,13 @@ void CommandLineInterfaceController_ClearBuffer(CommandLineInterfaceControllerHa
 void CommandLineInterfaceController_Init(CommandLineInterfaceControllerHandle_t *CLI)
 {
 	CLI->pCLI_Buffer = CommandLineInterfaceController_Buffer;
+	CLI->pCLI_MsgBuffer = CommandLineInterfaceController_MsgBuffer;
 
 	CLI->CLI_BufferSize = COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH;
+	CLI->CLI_MsgBufferSize = COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH;
 
 	CLI->CLI_BufferHead = 0u;
+	CLI->CLI_MsgBufferHead = 0u;
 }
 
 
@@ -35,15 +39,15 @@ void CommandLineInterfaceController_WriteMessage(CommandLineInterfaceControllerH
     // Check message length
 	if(strlen(msg) <= COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH)
 	{
-		Size = sprintf(CLI->pCLI_Buffer, msg);
+		Size = sprintf(CLI->pCLI_MsgBuffer, msg);
 	}
 	else
 	{
-		Size = sprintf(CLI->pCLI_Buffer, "ERROR : Message is too long !\r\n");
+		Size = sprintf(CLI->pCLI_MsgBuffer, "ERROR : Message is too long !\r\n");
 	}
 
     // Send the message
-	HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+	HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_MsgBuffer, Size, 100u);
 
 	// Clear the buffer
 	CommandLineInterfaceController_ClearBuffer(CLI);
@@ -119,32 +123,47 @@ static void CommandLineInterfaceController_Controller_Static_MessageHandler(Comm
 	// TODO - pack the message and send
 	uint8_t status;
 	uint16_t Size;
-
+	uint8_t packets;
 
 	msg[length++ + 1u] = '\n';
 	msg[length++ + 1u] = '\0';
 
-	if(length <= 32u)
+	packets = (length / 32u) + 1u;
+
+	for(uint8_t i = 0u; i < packets; ++i)
 	{
-		status = NRF24_write(msg, 32u);
+		status = NRF24_write(msg + 32u * i, 32u);
 
 		if(status & _BV(BIT_TX_DS))
 		{
-			Size = sprintf(CLI->pCLI_Buffer, "Transmitted Successfully\r\n");
-			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+			Size = sprintf(CLI->pCLI_MsgBuffer, "Transmitted Successfully\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_MsgBuffer, Size, 100u);
 		}
 		else if(status & _BV(BIT_MAX_RT))
 		{
-			Size = sprintf(CLI->pCLI_Buffer, "Max retransmission level reached\r\n");
-			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+			Size = sprintf(CLI->pCLI_MsgBuffer, "Max retransmission level reached\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_MsgBuffer, Size, 100u);
 		}
 		else
 		{
-			Size = sprintf(CLI->pCLI_Buffer, "Error\r\n");
-			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_Buffer, Size, 100u);
+			do
+			{
+				status = NRF24_write(msg + 32u * i, 32u);
+
+				Size = sprintf(CLI->pCLI_MsgBuffer, "Message not sent - trying to retransmit\r\n");
+				HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_MsgBuffer, Size, 100u);
+
+				HAL_Delay(1000u);
+			}
+			while(!(status & _BV(BIT_TX_DS)));
+
+			Size = sprintf(CLI->pCLI_MsgBuffer, "Retransmitted Successfully\r\n");
+			HAL_UART_Transmit(&huart2, (uint8_t*) CLI->pCLI_MsgBuffer, Size, 100u);
 		}
+
+		HAL_Delay(100u);
 	}
 	CommandLineInterfaceController_ClearBuffer(CLI);
 
-	NRF24_startListening();;
+	NRF24_startListening();
 }

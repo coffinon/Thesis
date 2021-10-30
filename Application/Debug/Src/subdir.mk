@@ -16,6 +16,7 @@ C_SRCS += \
 ../Src/syscalls.c \
 ../Src/sysmem.c \
 ../Src/system_stm32f4xx.c \
+../Src/tim.c \
 ../Src/usart.c 
 
 OBJS += \
@@ -30,6 +31,7 @@ OBJS += \
 ./Src/syscalls.o \
 ./Src/sysmem.o \
 ./Src/system_stm32f4xx.o \
+./Src/tim.o \
 ./Src/usart.o 
 
 C_DEPS += \
@@ -44,6 +46,7 @@ C_DEPS += \
 ./Src/syscalls.d \
 ./Src/sysmem.d \
 ./Src/system_stm32f4xx.d \
+./Src/tim.d \
 ./Src/usart.d 
 
 

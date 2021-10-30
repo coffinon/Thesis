@@ -295,12 +295,15 @@ uint8_t NRF24_write( const void* buf, uint8_t len )
 	NRF24_ce(0);
 
   	uint32_t sent_at = HAL_GetTick();
+  	uint32_t time_now;
 	do
   	{
 		//Get status register
 		status = NRF24_get_status();
+
+		time_now = HAL_GetTick();
   	}
-  	while( ! ( status & ( _BV(BIT_TX_DS) | _BV(BIT_MAX_RT) ) ) && ( HAL_GetTick() - sent_at < 10u ) );
+  	while( ! ( status & ( _BV(BIT_TX_DS) | _BV(BIT_MAX_RT) ) ) && ( time_now - sent_at < 10u ) );
 
 	// flush
 	NRF24_flush_tx();

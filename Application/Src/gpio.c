@@ -27,7 +27,7 @@
 /* Configure GPIO                                                             */
 /*----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
-extern uint8_t myRxData[100u];
+extern uint8_t myRxData[1000u];
 /* USER CODE END 1 */
 
 /** Configure pins as 
@@ -96,9 +96,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     // Read the data from RX FIFO
     NRF24_read(myRxData, 32);
 
-
-
-    HAL_UART_Transmit(&huart2, (uint8_t*)myRxData, 32u, 100u);
+    if(myRxData[0u] != 255u)
+    {
+      HAL_UART_Transmit(&huart2, (uint8_t*)myRxData, 32u, 100u);
+    }
 
     // Reset RX_DR flag in STATUS register
     NRF24_write_register(REG_STATUS,_BV(BIT_RX_DR) );

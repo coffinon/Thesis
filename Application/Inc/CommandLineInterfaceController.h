@@ -23,8 +23,11 @@
 typedef struct
 {
 	char *pCLI_Buffer;
+	char *pCLI_MsgBuffer;
 	uint16_t CLI_BufferSize;
+	uint16_t CLI_MsgBufferSize;
 	uint8_t CLI_BufferHead;
+	uint8_t CLI_MsgBufferHead;
 } CommandLineInterfaceControllerHandle_t;
 
 void CommandLineInterfaceController_ClearBuffer(CommandLineInterfaceControllerHandle_t *CLI);
