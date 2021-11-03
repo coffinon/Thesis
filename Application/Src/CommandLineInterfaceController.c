@@ -132,6 +132,11 @@ static void CommandLineInterfaceController_Controller_Static_MessageHandler(Comm
 
 	packets = (length / 32u) + 1u;
 
+	for(uint8_t i = 0u; i < (length + 32 - length % 32u); ++i)
+	{
+		msg[i] ^= 33u;
+	}
+
 	for(uint8_t i = 0u; i < packets; ++i)
 	{
 		status = NRF24_write(msg + 32u * i, 32u);

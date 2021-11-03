@@ -96,6 +96,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     // Read the data from RX FIFO
     NRF24_read(myRxData, 32);
 
+    for(uint8_t i = 0u; i < 32; ++i)
+    {
+    	myRxData[i] ^= 33u;
+    }
+
     if(myRxData[0u] != 255u)
     {
       HAL_UART_Transmit(&huart2, (uint8_t*)myRxData, 32u, 100u);
