@@ -7,10 +7,10 @@ extern uint8_t myTxBuffer[1000u];
 char CommandLineInterfaceController_Buffer[COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH];
 char CommandLineInterfaceController_MsgBuffer[COMMAND_LINE_INTERFACE_CONTROLLER_CMD_MAX_LENGTH];
 
-static void CommandLineInterfaceController_Controller_Static_HelpHandler(CommandLineInterfaceControllerHandle_t *CLI);
-static void CommandLineInterfaceController_Controller_Static_ConnectHandler(CommandLineInterfaceControllerHandle_t *CLI);
-static void CommandLineInterfaceController_Controller_Static_DisconnectHandler(CommandLineInterfaceControllerHandle_t *CLI);
-static void CommandLineInterfaceController_Controller_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI, char *msg, uint8_t length);
+static void CommandLineInterfaceController_Static_HelpHandler(CommandLineInterfaceControllerHandle_t *CLI);
+static void CommandLineInterfaceController_Static_ConnectHandler(CommandLineInterfaceControllerHandle_t *CLI);
+static void CommandLineInterfaceController_Static_DisconnectHandler(CommandLineInterfaceControllerHandle_t *CLI);
+static void CommandLineInterfaceController_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI, char *msg, uint8_t length);
 
 void CommandLineInterfaceController_ClearBuffer(CommandLineInterfaceControllerHandle_t *CLI)
 {
@@ -88,39 +88,39 @@ void CommandLineInterfaceController_GetCommand(CommandLineInterfaceControllerHan
 	switch(CommandNumber)
 	{
 		case 0u :
-			CommandLineInterfaceController_Controller_Static_HelpHandler(CLI);
+			CommandLineInterfaceController_Static_HelpHandler(CLI);
 			break;
 		case 1u :
-			CommandLineInterfaceController_Controller_Static_ConnectHandler(CLI);
+			CommandLineInterfaceController_Static_ConnectHandler(CLI);
 			break;
 		case 2u :
-			CommandLineInterfaceController_Controller_Static_DisconnectHandler(CLI);
+			CommandLineInterfaceController_Static_DisconnectHandler(CLI);
 			break;
 		default :
-			CommandLineInterfaceController_Controller_Static_MessageHandler(CLI, msg, length);
+			CommandLineInterfaceController_Static_MessageHandler(CLI, msg, length);
 	}
 }
 
 
-static void CommandLineInterfaceController_Controller_Static_HelpHandler(CommandLineInterfaceControllerHandle_t *CLI)
+static void CommandLineInterfaceController_Static_HelpHandler(CommandLineInterfaceControllerHandle_t *CLI)
 {
 	CommandLineInterfaceController_WriteMessage(CLI, ">> connect - show list of available connections\r\n");
 	CommandLineInterfaceController_WriteMessage(CLI, ">> disconnect - disconnect from all connections\r\n");
 }
 
-static void CommandLineInterfaceController_Controller_Static_ConnectHandler(CommandLineInterfaceControllerHandle_t *CLI)
+static void CommandLineInterfaceController_Static_ConnectHandler(CommandLineInterfaceControllerHandle_t *CLI)
 {
 	CommandLineInterfaceController_WriteMessage(CLI, "List of available connections : \r\n");
 	// TODO - connections list
 }
 
-static void CommandLineInterfaceController_Controller_Static_DisconnectHandler(CommandLineInterfaceControllerHandle_t *CLI)
+static void CommandLineInterfaceController_Static_DisconnectHandler(CommandLineInterfaceControllerHandle_t *CLI)
 {
 	// TODO - disconnect part of the code
 	CommandLineInterfaceController_WriteMessage(CLI, "Disconnected from all connections\r\n");
 }
 
-static void CommandLineInterfaceController_Controller_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI, char *msg, uint8_t length)
+static void CommandLineInterfaceController_Static_MessageHandler(CommandLineInterfaceControllerHandle_t *CLI, char *msg, uint8_t length)
 {
 	// TODO - pack the message and send
 	uint8_t status;

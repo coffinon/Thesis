@@ -150,20 +150,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   if (htim == &htim6)
   {
-	for(uint8_t i = 0u; i < 32; ++i)
-	{
-		msg[i] ^= 33u;
-	}
+    for(uint8_t i = 0u; i < 32; ++i)
+    {
+      msg[i] ^= 33u;
+    }
 
-	status = NRF24_write(msg, 32u);
+    status = NRF24_write(msg, 32u);
 
-	if(status & _BV(BIT_TX_DS))
-	{
-		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-		TIM7->CNT = 0u;
-	}
+    if(status & _BV(BIT_TX_DS))
+    {
+      HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+      TIM7->CNT = 0u;
+    }
 
-	NRF24_startListening();
+    NRF24_startListening();
   }
   else if(htim == &htim7)
   {

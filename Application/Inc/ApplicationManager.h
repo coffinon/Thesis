@@ -9,8 +9,6 @@
 
 #define APP_STATE_WAITING				0u
 #define APP_STATE_GOT_COMMAND			1u
-#define APP_STATE_GOT_PACKET			2u
-#define APP_STATE_GOT_ENCRYPTED_PACKET	3u
 
 
 typedef struct

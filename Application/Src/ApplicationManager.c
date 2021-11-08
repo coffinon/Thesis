@@ -4,9 +4,6 @@ extern CommandLineInterfaceControllerHandle_t hCLI;
 
 static void ApplicationManager_Static_WaitingHandler(void);
 static void ApplicationManager_Static_GotCommandHandler(ApplicationHandler_t *App);
-static void ApplicationManager_Static_GotPacketHandler(void);
-static void ApplicationManager_Static_GotEncryptedPacketHandler(void);
-static void ApplicationManager_Static_DefaultHandler(void);
 
 
 void ApplicationManager_Init(ApplicationHandler_t *App)
@@ -27,21 +24,15 @@ void ApplicationManager_StateMachine(ApplicationHandler_t *App)
 			case APP_STATE_GOT_COMMAND :
 				ApplicationManager_Static_GotCommandHandler(App);
 				break;
-			case APP_STATE_GOT_PACKET :
-				ApplicationManager_Static_GotPacketHandler();
-				break;
-			case APP_STATE_GOT_ENCRYPTED_PACKET :
-				ApplicationManager_Static_GotEncryptedPacketHandler();
-				break;
 			default :
-				ApplicationManager_Static_DefaultHandler();
+				ApplicationManager_Static_WaitingHandler();
 		}
 	}
 }
 
 static void ApplicationManager_Static_WaitingHandler(void)
 {
-	// TODO
+	// Wait, and listen to the radio channel - default state
 }
 
 static void ApplicationManager_Static_GotCommandHandler(ApplicationHandler_t *App)
@@ -51,19 +42,4 @@ static void ApplicationManager_Static_GotCommandHandler(ApplicationHandler_t *Ap
 
 	// Reset application state
 	App->ApplicationState = APP_STATE_WAITING;
-}
-
-static void ApplicationManager_Static_GotPacketHandler(void)
-{
-	// TODO
-}
-
-static void ApplicationManager_Static_GotEncryptedPacketHandler(void)
-{
-	// TODO
-}
-
-static void ApplicationManager_Static_DefaultHandler(void)
-{
-	// TODO
 }
